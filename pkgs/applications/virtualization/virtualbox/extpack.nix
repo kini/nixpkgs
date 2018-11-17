@@ -1,18 +1,26 @@
-{ fetchurl, lib, virtualbox }:
-let
-  inherit (virtualbox) version;
-in
-fetchurl rec {
-  name = "Oracle_VM_VirtualBox_Extension_Pack-${version}.vbox-extpack";
-  url = "https://download.virtualbox.org/virtualbox/${version}/${name}";
-  sha256 =
-    # Manually sha256sum the extensionPack file, must be hex!
-    # Thus do not use `nix-prefetch-url` but instead plain old `sha256sum`.
-    # Checksums can also be found at https://www.virtualbox.org/download/hashes/${version}/SHA256SUMS
-    let value = "d750fb17688d70e0cb2d7b06f1ad3a661303793f4d1ac39cfa9a54806b89da25";
-    in assert (builtins.stringLength value) == 64; value;
+{ fetchurl, stdenv, virtualbox }:
 
-  meta = with lib; {
+stdenv.mkDerivation rec {
+  pname = "Oracle_VM_VirtualBox_Extension_Pack";
+  inherit (virtualbox) version;
+
+  src = fetchurl {
+    url = "http://download.virtualbox.org/virtualbox/${version}/${pname}-${version}.vbox-extpack";
+    sha256 = "0i74s6lcn8alksk3vvg4cbqdk5nlic3r55npyk60ljv581lrb817";
+  };
+
+  unpackCmd = ''
+    mkdir -p out
+    tar xf $curSrc -C out
+  '';
+  dontBuild = true;
+
+  installPhase = ''
+    mkdir -p $out/${pname}
+    cp -R * $out/${pname}
+  '';
+
+  meta = with stdenv.lib; {
     description = "Oracle Extension pack for VirtualBox";
     license = licenses.virtualbox-puel;
     homepage = "https://www.virtualbox.org/";
