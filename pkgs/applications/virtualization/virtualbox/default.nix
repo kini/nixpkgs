@@ -132,6 +132,7 @@ in stdenv.mkDerivation (finalAttrs: {
     ./qt-dependency-paths.patch
     # https://github.com/NixOS/nixpkgs/issues/123851
     ./fix-audio-driver-loading.patch
+    ./0001-ExtPackManagerImpl-read-vboxExtpackDir-from-VBOX_EXT.patch
   ];
 
   postPatch = ''
