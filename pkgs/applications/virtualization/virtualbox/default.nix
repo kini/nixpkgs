@@ -220,18 +220,6 @@ in stdenv.mkDerivation (finalAttrs: {
         ln -s "$libexec/$file" $out/bin/$file
     done
 
-    ${optionalString (extensionPack != null) ''
-      mkdir -p "$share"
-      "${fakeroot}/bin/fakeroot" "${stdenv.shell}" <<EOF
-      "$libexec/VBoxExtPackHelperApp" install \
-        --base-dir "$share/ExtensionPacks" \
-        --cert-dir "$share/ExtPackCertificates" \
-        --name "Oracle VM VirtualBox Extension Pack" \
-        --tarball "${extensionPack}" \
-        --sha-256 "${extensionPack.outputHash}"
-      EOF
-    ''}
-
     ${optionalString (!headless) ''
       # Create and fix desktop item
       mkdir -p $out/share/applications
@@ -267,7 +255,6 @@ in stdenv.mkDerivation (finalAttrs: {
   '';
 
   passthru = {
-    inherit extensionPack; # for inclusion in profile to prevent gc
     tests = nixosTests.virtualbox;
     updateScript = ./update.sh;
   };
