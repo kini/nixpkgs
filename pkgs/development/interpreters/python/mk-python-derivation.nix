@@ -64,6 +64,9 @@
 # Skip wrapping of python programs altogether
 , dontWrapPythonPrograms ? false
 
+# Make wrapper set not only the site dirs / PYTHONPATH but also .../bin directories into PATH
+, wrapPATH ? true
+
 # Don't use Pip to install a wheel
 # Note this is actually a variable for the pipInstallPhase in pip's setupHook.
 # It's included here to prevent an infinite recursion.
@@ -109,7 +112,7 @@ let
   name_ = name;
 
   self = toPythonModule (stdenv.mkDerivation ((builtins.removeAttrs attrs [
-    "disabled" "checkPhase" "checkInputs" "doCheck" "doInstallCheck" "dontWrapPythonPrograms" "catchConflicts" "format"
+    "disabled" "checkPhase" "checkInputs" "doCheck" "doInstallCheck" "dontWrapPythonPrograms" "wrapPATH" "catchConflicts" "format"
     "disabledTestPaths"
   ]) // {
 
@@ -165,7 +168,9 @@ let
       setuptoolsCheckHook
     ] ++ checkInputs;
 
-    postFixup = lib.optionalString (!dontWrapPythonPrograms) ''
+    postFixup = lib.optionalString (wrapPATH) ''
+      wrapPATH=true
+    '' + lib.optionalString (!dontWrapPythonPrograms) ''
       wrapPythonPrograms
     '' + attrs.postFixup or "";
 

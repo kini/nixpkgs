@@ -71,10 +71,10 @@ wrapPythonProgramsIn() {
                     # wrapProgram creates the executable shell script described
                     # above. The script will set PYTHONPATH and PATH variables.!
                     # (see pkgs/build-support/setup-hooks/make-wrapper.sh)
-                    local -a wrap_args=("$f"
-                                    --prefix PATH ':' "$program_PATH"
-                                    )
-
+                    local -a wrap_args=("$f")
+                    if [ -n "$wrapPATH" ]; then
+                        wrap_args+=(--prefix PATH ':' "$program_PATH")
+                    fi
                     if [ -z "$permitUserSite" ]; then
                         wrap_args+=(--set PYTHONNOUSERSITE "true")
                     fi
